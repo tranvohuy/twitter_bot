@@ -4,7 +4,6 @@ import tweepy
 from datetime import date
 
 
-# use this for production; set vars in heroku dashboard
 from os import environ
 Consumer_key= environ['Consumer_key']
 CONSUMER_SECRET = environ['Consumer_secret']
@@ -18,10 +17,9 @@ auth = tweepy.OAuthHandler(Consumer_key, Consumer_secret)
 auth.set_access_token(Access_key, Access_secret)
 api = tweepy.API(auth)
 
-while True:
-    print("about to get ad...")
+if __name__=='__main__':
+    print("about to update ststus...")
     #message = get_message()
     message = 'today is:' + date.today().isoformat()
 
     api.update_status(message)
-    time.sleep(INTERVAL)
