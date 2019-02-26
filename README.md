@@ -3,7 +3,8 @@ It will search rental appartments (Mietwohnung) in Berlin (district Charlottenbu
 
 References:
 * Search on Immobilienscout24:
-* * https://github.com/balzer82/immoscraper, using BeautifulSoup
-* * https://github.com/asmaier/ImmoSpider, using Scraper
-* [Heroku via Github](https://github.com/tranvohuy/simple_twitter_bot_Heroku_via_Github)
-* [Heroku via HerokuCLI](https://github.com/tranvohuy/simple_twitter_bot)
+  * https://github.com/balzer82/immoscraper, using BeautifulSoup
+  * https://github.com/asmaier/ImmoSpider, using Scraper
+* Host server for bot:
+  * [Heroku via Github](https://github.com/tranvohuy/simple_twitter_bot_Heroku_via_Github)
+  * [Heroku via HerokuCLI](https://github.com/tranvohuy/simple_twitter_bot)
