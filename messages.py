@@ -1,6 +1,6 @@
-#source https://github.com/balzer82/immoscraper
-#put it in get_message
-
+#sources https://github.com/balzer82/immoscraper
+#and https://github.com/asmaier/ImmoSpider
+#
 from bs4 import BeautifulSoup
 import json
 import urllib.request as urllib2
@@ -62,102 +62,98 @@ def immoscout24parser(url):
         print("Fehler in immoscout24 parser: %s" % e)
 
 
-immos = {}
+def calculate(b='Berlin', s= 'Berlin', d='Charlottenburg-Charlottenburg', k = 'Wohnung', w = 'Miete', nr=1):
+    immos = {}
 
-b = 'Berlin' # Bundesland
-s = 'Berlin' # Stadt
-d = '' #district
-k = 'Wohnung' # Wohnung oder Haus
-w = 'Miete' # Miete oder Kauf
-Zimmer = '1' #lower bound for number of rooms
+   
+    page = 0
 
-page = 0
-print('Suche %s / %s' % (k, w))
+    while True:
+        page+=1
+        url = 'https://www.immobilienscout24.de/Suche/S-T/P-%s/%s-%s/%s/%s/%s/' % (page, k, w, b, s, d)
+        #Two url examples:
+        #https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Berlin/Berlin/Charlottenburg-Charlottenburg?enteredFrom=result_list
+        #https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Berlin/Berlin/Charlottenburg-Charlottenburg/0,90-/15,00-/EURO-234,00-
 
-while True:
-    page+=1
-    #url = 'http://www.immobilienscout24.de/Suche/S-T/P-%s/%s-%s/%s/%s?pagerReporting=true' % (page, k, w, b, s)
-    #http://www.immobilienscout24.de/Suche/S-T/P-0/Haus-Kauf/Sachsen/Dresden?pagerReporting=true
-    url = 'https://www.immobilienscout24.de/Suche/S-T/P-%s/Wohnung-Miete/Berlin/Berlin/Charlottenburg-Charlottenburg/%s-' % (page, Zimmer)
-    #https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Berlin/Berlin/Charlottenburg-Charlottenburg?enteredFrom=result_list
+        # Because of some timeout or immoscout24.de errors,
+        # we try until it works \o/
+        resultlist_json = None
+        while resultlist_json is None:
+            try:
+                resultlist_json = immoscout24parser(url)
+                numberOfPages = int(resultlist_json[u'paging'][u'numberOfPages'])
+                pageNumber = int(resultlist_json[u'paging'][u'pageNumber'])
+            except:
+                pass
 
-    # Because of some timeout or immoscout24.de errors,
-    # we try until it works \o/
-    resultlist_json = None
-    while resultlist_json is None:
-        try:
-            resultlist_json = immoscout24parser(url)
-            numberOfPages = int(resultlist_json[u'paging'][u'numberOfPages'])
-            pageNumber = int(resultlist_json[u'paging'][u'pageNumber'])
-        except:
-            pass
+        if page>numberOfPages:
+            break
 
-    if page>numberOfPages:
-        break
+        # Get the data
+        for resultlistEntry in resultlist_json['resultlistEntries'][0][u'resultlistEntry']:
+            realEstate_json = resultlistEntry[u'resultlist.realEstate']
 
-    # Get the data
-    for resultlistEntry in resultlist_json['resultlistEntries'][0][u'resultlistEntry']:
-        realEstate_json = resultlistEntry[u'resultlist.realEstate']
-        
-        realEstate = {}
+            realEstate = {}
 
-        realEstate[u'Miete/Kauf'] = w
-        realEstate[u'Haus/Wohnung'] = k
+            realEstate[u'Miete/Kauf'] = w
+            realEstate[u'Haus/Wohnung'] = k
 
-        realEstate['address'] = realEstate_json['address']['description']['text']
-        realEstate['city'] = realEstate_json['address']['city']
-        realEstate['postcode'] = realEstate_json['address']['postcode']
-        realEstate['quarter'] = realEstate_json['address']['quarter']
-        try:
-            realEstate['lat'] = realEstate_json['address'][u'wgs84Coordinate']['latitude']
-            realEstate['lon'] = realEstate_json['address'][u'wgs84Coordinate']['longitude']
-        except:
-            realEstate['lat'] = None
-            realEstate['lon'] = None
-            
-        realEstate['title'] = realEstate_json['title']
+            realEstate['address'] = realEstate_json['address']['description']['text']
+            realEstate['city'] = realEstate_json['address']['city']
+            realEstate['postcode'] = realEstate_json['address']['postcode']
+            realEstate['quarter'] = realEstate_json['address']['quarter']
+            try:
+                realEstate['lat'] = realEstate_json['address'][u'wgs84Coordinate']['latitude']
+                realEstate['lon'] = realEstate_json['address'][u'wgs84Coordinate']['longitude']
+            except:
+                realEstate['lat'] = None
+                realEstate['lon'] = None
 
-        realEstate['numberOfRooms'] = realEstate_json['numberOfRooms']
-        realEstate['livingSpace'] = realEstate_json['livingSpace']
-        
-        if k=='Wohnung':
-            realEstate['balcony'] = realEstate_json['balcony']
-            realEstate['builtInKitchen'] = realEstate_json['builtInKitchen']
-            realEstate['garden'] = realEstate_json['garden']
-            realEstate['price'] = realEstate_json['price']['value']
-            realEstate['privateOffer'] = realEstate_json['privateOffer']
-        elif k=='Haus':
-            realEstate['isBarrierFree'] = realEstate_json['isBarrierFree']
-            realEstate['cellar'] = realEstate_json['cellar']
-            realEstate['plotArea'] = realEstate_json['plotArea']
-            realEstate['price'] = realEstate_json['price']['value']
-            realEstate['privateOffer'] = realEstate_json['privateOffer']
-        
-        realEstate['floorplan'] = realEstate_json['floorplan']
-        realEstate['from'] = realEstate_json['companyWideCustomerId']
-        realEstate['ID'] = realEstate_json[u'@id']
-        realEstate['url'] = u'https://www.immobilienscout24.de/expose/%s' % realEstate['ID']
+            realEstate['title'] = realEstate_json['title']
 
-        immos[realEstate['ID']] = realEstate
+            realEstate['numberOfRooms'] = realEstate_json['numberOfRooms']
+            realEstate['livingSpace'] = realEstate_json['livingSpace']
 
-    print('Scrape Page %i/%i (%i Immobilien %s %s gefunden)' % (page, numberOfPages, len(immos), k, w))
+            if k=='Wohnung':
+                realEstate['balcony'] = realEstate_json['balcony']
+                realEstate['builtInKitchen'] = realEstate_json['builtInKitchen']
+                realEstate['garden'] = realEstate_json['garden']
+                realEstate['price'] = realEstate_json['price']['value']
+                realEstate['privateOffer'] = realEstate_json['privateOffer']
+            elif k=='Haus':
+                realEstate['isBarrierFree'] = realEstate_json['isBarrierFree']
+                realEstate['cellar'] = realEstate_json['cellar']
+                realEstate['plotArea'] = realEstate_json['plotArea']
+                realEstate['price'] = realEstate_json['price']['value']
+                realEstate['privateOffer'] = realEstate_json['privateOffer']
 
-print("Scraped %i Immos" % len(immos))
+            realEstate['floorplan'] = realEstate_json['floorplan']
+            realEstate['from'] = realEstate_json['companyWideCustomerId']
+            realEstate['ID'] = realEstate_json[u'@id']
+            realEstate['url'] = u'https://www.immobilienscout24.de/expose/%s' % realEstate['ID']
 
+            immos[realEstate['ID']] = realEstate
 
+        print('Scrape Page %i/%i (%i Immobilien %s %s gefunden)' % (page, numberOfPages, len(immos), k, w))
 
+    print("Scraped %i Immos" % len(immos))
 
-
-df = pd.DataFrame(immos).T
-df.index.name = 'ID'
+    #data frame
+    df = pd.DataFrame(immos).T
+    df.index.name = 'ID'
+    avg_price = int(df[df['numberOfRooms']==nr]['price'].mean())
+    min_price = df[df['numberOfRooms']==nr]['price'].min()
+    max_price = df[df['numberOfRooms']==nr]['price'].max()
+    return [avg_price, min_price, max_price]
 
 def get_message():
-  #compute average house rent for 2 bedrooms in Charlottenburg
-  nr = 2
-  avg_price = df[df['numberOfRooms']==nr]['price'].mean()
-  min_price = df[df['numberOfRooms']==nr]['price'].min()
-  max_price = df[df['numberOfRooms']==nr]['price'].max()
-  msg = 'Cold rental price of apartments with %s rooms: \n %s€(average), %s€(minimum), %s€(maximum)' %(nr, int(avg_price), min_price, max_price)
+  b = 'Berlin' # Bundesland
+  s = 'Berlin' # Stadt
+  d = 'Charlottenburg-Charlottenburg' #district
+  k = 'Wohnung' # Wohnung oder Haus
+  w = 'Miete' # Miete oder Kauf
+  nr= 2
+  avg_price, min_price, max_price = calculate(b, s, d, k, w, nr)
+  msg = 'Cold rental price of apartments with %s rooms in district %s: \n %s€(average), %s€(minimum), %s€(maximum)' %(nr, d, int(avg_price), min_price, max_price)
   print(msg)
   return msg
-
