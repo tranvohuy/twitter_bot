@@ -17,8 +17,8 @@ auth.set_access_token(Access_key, Access_secret)
 api = tweepy.API(auth)
 
 if __name__=='__main__':
-    print("about to update status...")
     
     message = get_message()
 
+    print("about to update status...")
     api.update_status(message)
