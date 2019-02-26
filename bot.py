@@ -1,6 +1,7 @@
 #import sys
 import tweepy
 from datetime import date
+from messages import get_message
 
 
 from os import environ
@@ -16,8 +17,8 @@ auth.set_access_token(Access_key, Access_secret)
 api = tweepy.API(auth)
 
 if __name__=='__main__':
-    print("about to update ststus...")
-    #message = get_message()
-    message = 'today is:' + date.today().isoformat()
+    print("about to update status...")
+    
+    message = get_message()
 
     api.update_status(message)
