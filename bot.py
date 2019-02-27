@@ -13,7 +13,7 @@ Consumer_secret = environ['Consumer_secret']
 Access_key = environ['Access_key']
 Access_secret = environ['Access_secret']
 
-json_cred = environ['google_cred']
+json_creds = environ['google_cred']
 
 
 auth = tweepy.OAuthHandler(Consumer_key, Consumer_secret)
@@ -22,8 +22,9 @@ api = tweepy.API(auth)
 
 scopes = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_dict(keyfile_dict=json_cred, scopes=scopes)
-gc = gspread.authorize(creds)
+creds_dict["private_key"] = creds_dict["private_key"].replace("\\\\n", "\n")
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scopes)
+client = gspread.authorize(creds)
 
 
 if __name__=='__main__':
