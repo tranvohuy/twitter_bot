@@ -8,3 +8,6 @@ References:
 * Host server for bot:
   * [Heroku via Github](https://github.com/tranvohuy/simple_twitter_bot_Heroku_via_Github)
   * [Heroku via HerokuCLI](https://github.com/tranvohuy/simple_twitter_bot)
+* Twitter
+  * [Twitter API](https://developer.twitter.com/en/docs.html)
+  * [Tweepy](http://docs.tweepy.org/en/v3.5.0/getting_started.html), a python library to work with Twitter
