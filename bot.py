@@ -14,6 +14,8 @@ Access_key = environ['Access_key']
 Access_secret = environ['Access_secret']
 
 json_creds = environ['google_cred']
+creds_dict = json.loads(json_creds)
+
 
 
 auth = tweepy.OAuthHandler(Consumer_key, Consumer_secret)
