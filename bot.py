@@ -26,7 +26,7 @@ scopes = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 creds_dict["private_key"] = creds_dict["private_key"].replace("\\\\n", "\n")
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scopes)
-client = gspread.authorize(creds)
+gc = gspread.authorize(creds)
 
 
 if __name__=='__main__':
