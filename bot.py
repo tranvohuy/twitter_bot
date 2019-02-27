@@ -13,7 +13,7 @@ Consumer_secret = environ['Consumer_secret']
 Access_key = environ['Access_key']
 Access_secret = environ['Access_secret']
 
-json_cred = envirion['google_cred']
+json_cred = environ['google_cred']
 
 
 auth = tweepy.OAuthHandler(Consumer_key, Consumer_secret)
