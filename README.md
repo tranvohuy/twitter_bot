@@ -11,3 +11,5 @@ References:
 * Twitter
   * [Twitter API](https://developer.twitter.com/en/docs.html)
   * [Tweepy](http://docs.tweepy.org/en/v3.5.0/getting_started.html), a python library to work with Twitter
+  
+* [Google credential with json in Heroku](https://gist.github.com/hpiwowar/e8360c534444dc26f7fe65dabf138902)
