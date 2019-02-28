@@ -34,4 +34,5 @@ if __name__=='__main__':
     message = get_message()
 
     print("about to update status...")
-    api.update_status(message)
+    try:
+         api.update_status(message)
